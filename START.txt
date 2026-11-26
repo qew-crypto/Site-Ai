@@ -1,7 +1,7 @@
 КОНТУР — запуск на Linux / VPS
 
 Нужен Python 3.11+. Node.js для запуска не нужен.
-В папке contour-python создай .env по образцу .env.example. Заполни
+В корне проекта создай .env по образцу .env.example. Заполни
 CHAT_PASSWORD для гостей и, по желанию, CHAT_ADMIN_PASSWORD для владельца.
 
   python -m pip install -r requirements.txt

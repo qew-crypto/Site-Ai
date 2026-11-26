@@ -14,6 +14,7 @@ import aiohttp
 from aiohttp import web
 
 from provider import MAX_CONTEXT_BINARY, ProviderError, endpoint, generate, normalize_messages, provider_client
+from sessions import SessionLimitError, SessionStore
 
 ROOT = Path(__file__).resolve().parent
 PUBLIC = ROOT / 'public' if (ROOT / 'public').is_dir() else ROOT.parent / 'public'
@@ -21,6 +22,7 @@ KATEX = PUBLIC / 'vendor' / 'katex'
 if not KATEX.is_dir():
     KATEX = ROOT.parent / 'node_modules' / 'katex' / 'dist'
 DAY = 86400
+SESSION_AGE = {'guest': 30 * DAY, 'admin': 7 * DAY}
 COOKIE = 'contour_session'
 JSON_LIMIT = 512_000
 CHAT_LIMIT = JSON_LIMIT + MAX_CONTEXT_BINARY
@@ -101,10 +103,15 @@ def clean(value, cap):
 
 def parse_settings(data, previous):
     url, model, submitted = (clean(data.get(name), cap) for name, cap in (('url', 512), ('model', 160), ('key', 2048)))
+    if not 1 <= len(url) <= 512:
+        raise RequestError(400, 'Укажите URL API (до 512 символов).')
+    if not 1 <= len(model) <= 160:
+        raise RequestError(400, 'Укажите название модели (до 160 символов).')
     key = submitted or (previous or {}).get('key', '')
-    if (not 1 <= len(url) <= 512 or not 1 <= len(model) <= 160 or not 1 <= len(key) <= 2048
-            or not re.fullmatch(r'[\x21-\x7e]+', key)):
-        raise RequestError(400, 'Заполните URL API, ключ и название модели.')
+    if not key:
+        raise RequestError(400, 'Вставьте ключ API из кабинета провайдера.')
+    if len(key) > 2048 or not re.fullmatch(r'[\x21-\x7e]+', key) or key.startswith(('"', "'")) or key.endswith(('"', "'")):
+        raise RequestError(400, 'Вставьте только ключ API, без «Bearer», пробелов, кавычек или скрытых символов.')
     try:
         destination = endpoint(url)
         if previous and not submitted and endpoint(previous['url']).origin() != destination.origin():
@@ -119,7 +126,7 @@ def parse_settings(data, previous):
     }
 
 
-def create_app(password, admin_password, data_dir, trust_proxy=False, complete=generate):
+def create_app(password, admin_password, data_dir, trust_proxy=False, complete=generate, *, secure_cookies=False):
     if not password or len(password) > 1024:
         raise ValueError('Укажите пароль чата в CHAT_PASSWORD (до 1024 символов).')
     data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -133,7 +140,8 @@ def create_app(password, admin_password, data_dir, trust_proxy=False, complete=g
     guest_hash, admin_hash = digest(password), digest(admin_password)
     config_file = data_dir / 'provider.json'
     config = json.loads(config_file.read_text(encoding='utf-8')) if config_file.exists() else None
-    sessions, auth_limit, chat_limit = {}, {}, {}
+    sessions = SessionStore(data_dir / 'sessions.sqlite3', {'guest': guest_hash, 'admin': admin_hash})
+    auth_limit, chat_limit = {}, {}
     active = set()
     client = None
 
@@ -153,8 +161,7 @@ def create_app(password, admin_password, data_dir, trust_proxy=False, complete=g
                 'thinking': config['reasoning'] != 'off'}
 
     def signed_in(request):
-        saved = sessions.get(request.cookies.get(COOKIE, ''))
-        return saved[0] if saved and saved[1] > time.monotonic() else None
+        return sessions.role(request.cookies.get(COOKIE))
 
     def is_proxy(request):
         return trust_proxy and request.remote in ('127.0.0.1', '::1')
@@ -164,7 +171,7 @@ def create_app(password, admin_password, data_dir, trust_proxy=False, complete=g
         return forwarded or request.remote
 
     def set_cookie(response, request, value='', age=0):
-        secure = request.secure or (is_proxy(request) and request.headers.get('X-Forwarded-Proto') == 'https')
+        secure = secure_cookies or request.secure or (is_proxy(request) and request.headers.get('X-Forwarded-Proto') == 'https')
         response.set_cookie(COOKIE, value, path='/', httponly=True, secure=secure, samesite='Strict', max_age=age)
         return response
 
@@ -179,19 +186,17 @@ def create_app(password, admin_password, data_dir, trust_proxy=False, complete=g
             candidate = ''
         if not hmac.compare_digest(digest(candidate), admin_hash if admin else guest_hash):
             raise RequestError(401, 'Неверный пароль.')
-        now = time.monotonic()
-        for expired in [token for token, (_, end) in sessions.items() if end <= now]:
-            sessions.pop(expired)
-        sessions.pop(request.cookies.get(COOKIE, ''), None)
-        if len(sessions) >= 5000:
-            raise RequestError(503, 'Слишком много активных сессий.')
-        token, role = secrets.token_hex(32), 'admin' if admin else 'guest'
-        sessions[token] = (role, now + DAY)
-        return set_cookie(send_json({'role': role, **visible()}), request, token, DAY)
+        role = 'admin' if admin else 'guest'
+        age = SESSION_AGE[role]
+        try:
+            token = sessions.issue(role, request.cookies.get(COOKIE), age)
+        except SessionLimitError:
+            raise RequestError(503, 'Слишком много активных сессий.') from None
+        return set_cookie(send_json({'role': role, **visible()}), request, token, age)
 
     async def logout(request):
         await read_json(request)
-        sessions.pop(request.cookies.get(COOKIE, ''), None)
+        sessions.revoke(request.cookies.get(COOKIE))
         return set_cookie(send_json({'role': None, **visible()}), request)
 
     async def settings(request):
@@ -287,7 +292,7 @@ def create_app(password, admin_password, data_dir, trust_proxy=False, complete=g
 def load_env(path):
     if not path.is_file():
         return
-    allowed = {'CHAT_PASSWORD', 'CHAT_ADMIN_PASSWORD', 'CHAT_DATA_DIR', 'TRUST_PROXY', 'HOST', 'PORT'}
+    allowed = {'CHAT_PASSWORD', 'CHAT_ADMIN_PASSWORD', 'CHAT_DATA_DIR', 'CHAT_SECURE_COOKIES', 'TRUST_PROXY', 'HOST', 'PORT'}
     for index, raw in enumerate(path.read_text(encoding='utf-8-sig').splitlines(), 1):
         line = raw.strip()
         if not line or line.startswith('#'):
@@ -311,7 +316,8 @@ if __name__ == '__main__':
     try:
         load_env(ROOT / '.env')
         app = create_app(os.getenv('CHAT_PASSWORD'), os.getenv('CHAT_ADMIN_PASSWORD'),
-                         Path(os.getenv('CHAT_DATA_DIR', str(ROOT / '.data'))), os.getenv('TRUST_PROXY') == '1')
+                         Path(os.getenv('CHAT_DATA_DIR', str(ROOT / '.data'))), os.getenv('TRUST_PROXY') == '1',
+                         secure_cookies=os.getenv('CHAT_SECURE_COOKIES') == '1')
     except ValueError as error:
         raise SystemExit(str(error)) from None
     web.run_app(app, host=os.getenv('HOST', '127.0.0.1'), port=int(os.getenv('PORT', '8000')),

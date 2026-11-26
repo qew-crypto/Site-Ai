@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f0f15">
+  <title>Контур — пространство для диалога</title>
+  <link rel="icon" href="/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <svg class="icons" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.2a7.6 7.6 0 0 1-7.8 7.3 8.1 8.1 0 0 1-3-.6l-4 1 .9-3.6a6.9 6.9 0 0 1-1.8-4.1 7.6 7.6 0 0 1 7.9-7.4 7.6 7.6 0 0 1 7.8 7.4Z"/><path d="M9 11.3h6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="10" rx="2"/><path d="M8.5 10.5V7a3.5 3.5 0 1 1 7 0v3.5M12 14.5v2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" fill="var(--icon-bg, #14141d)"/><circle cx="15" cy="17" r="2.5" fill="var(--icon-bg, #14141d)"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-diag" viewBox="0 0 24 24"><path d="M6 18 18 6M8 6h10v10"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="m5 19 4-.8L19 8.1a2 2 0 0 0-2.8-2.8L6.1 15.4 5 19Zm9.8-12.2 2.8 2.8M4 21h16"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-13-2 16"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5c0 6 3.5 9.5 9.5 9.5-6 0-9.5 3.5-9.5 9.5 0-6-3.5-9.5-9.5-9.5 6 0 9.5-3.5 9.5-9.5Z"/></symbol>
+    <symbol id="i-think" viewBox="0 0 24 24"><path d="M12 4a3 3 0 0 0-5.5 1.7 3.8 3.8 0 0 0-2.3 5.5 3.6 3.6 0 0 0 1.5 6.2 3.2 3.2 0 0 0 6.3-.4V4Zm0 0a3 3 0 0 1 5.5 1.7 3.8 3.8 0 0 1 2.3 5.5 3.6 3.6 0 0 1-1.5 6.2 3.2 3.2 0 0 1-6.3-.4M7.3 10c1.8.2 2.8 1.1 3 2.6m6.4-2.6c-1.8.2-2.8 1.1-3 2.6"/></symbol>
+    <symbol id="i-stream" viewBox="0 0 24 24"><path d="m13 2-8 12h6l-1 8 9-12h-6l1-8Z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.5 5.5-9.5 5.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.2"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-attach" viewBox="0 0 24 24"><path d="m8.5 13.5 6-6a2.5 2.5 0 0 1 3.5 3.5l-7 7a4 4 0 0 1-5.7-5.7l7-7a5.5 5.5 0 0 1 7.8 7.8l-6.5 6.5"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6m-6 4h6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M15 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 6h16M9 6V4h6v2M6 6l1 14h10l1-14M10 10v6m4-6v6"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-1.5a7 7 0 0 1 14 0V20"/></symbol>
+  </svg>
+  <div class="workspace" id="workspace">
+    <aside class="sidebar" id="sidebar" aria-label="Боковая панель">
+      <a href="/" class="brand" aria-label="Контур — главная">
+        <img src="/mark.svg" width="39" height="39" alt="">
+        <span><b>Контур<span>.</span></b><small>AI WORKSPACE</small></span>
+      </a>
+      <button class="new-chat" id="new-chat" type="button"><svg class="icon"><use href="#i-plus"/></svg> Новый чат</button>
+      <section class="history" aria-labelledby="history-title">
+        <h2 id="history-title">ИСТОРИЯ <span id="history-count" class="history-count">00</span></h2>
+        <p class="history-empty" id="history-empty">Здесь появятся ваши диалоги</p>
+        <ul id="history-list"></ul>
+      </section>
+      <div class="sidebar-footer">
+        <button type="button" id="settings" class="side-action"><svg class="icon"><use href="#i-settings"/></svg> Настройки API <svg class="icon end-icon"><use href="#i-diag"/></svg></button>
+        <div class="sidebar-bottom"><span class="status-dot"></span><span>Закрытое пространство</span></div>
+      </div>
+    </aside>
+    <button class="side-overlay" id="side-overlay" type="button" aria-label="Закрыть боковую панель" hidden></button>
+    <main class="main">
+      <header class="topbar">
+        <div class="top-left">
+          <button type="button" class="icon-btn mobile-menu" id="mobile-menu" aria-label="Боковая панель" aria-expanded="false" aria-controls="sidebar"><svg class="icon"><use href="#i-menu"/></svg></button>
+          <svg class="icon top-chat" aria-hidden="true"><use href="#i-chat"/></svg>
+          <span id="chat-heading">Новый диалог</span>
+        </div>
+        <div class="top-right">
+          <span class="model-status" id="model-status"><span class="status-dot"></span><span id="model-label">Модель не подключена</span></span>
+          <button type="button" class="account" id="account"><svg class="icon"><use href="#i-lock"/></svg><span>Войти</span></button>
+        </div>
+      </header>
+      <div class="content" id="content" tabindex="-1">
+        <div class="welcome" id="welcome">
+          <section class="hero" aria-labelledby="welcome-title">
+            <img class="orbit" src="/orbit.svg" alt="" draggable="false">
+            <span class="orbit-note" aria-hidden="true">FIG. 01 <span></span> КОНТУР СИГНАЛА</span>
+            <div class="hero-copy">
+              <div class="eyebrow"><svg class="icon"><use href="#i-spark"/></svg> ПРОСТРАНСТВО ДЛЯ ДИАЛОГА</div>
+              <h1 id="welcome-title">У каждой идеи<br> <em>есть контур.</em></h1>
+              <p>Задавайте вопросы, находите идеи и решайте задачи. Всё начинается с одного сообщения.</p>
+            </div>
+          </section>
+          <section class="suggestions" aria-labelledby="suggestions-title">
+            <h2 id="suggestions-title">С ЧЕГО НАЧНЁМ? <span></span></h2>
+            <div class="suggestion-grid">
+              <button class="suggestion" type="button" data-prompt="Помоги мне улучшить этот текст: "><span class="suggestion-icon"><svg class="icon"><use href="#i-pen"/></svg></span><svg class="icon suggest-arrow"><use href="#i-diag"/></svg><strong>Написать текст</strong><span class="suggestion-note">Подобрать нужные слова</span></button>
+              <button class="suggestion" type="button" data-prompt="Объясни простыми словами: "><span class="suggestion-icon"><svg class="icon"><use href="#i-spark"/></svg></span><svg class="icon suggest-arrow"><use href="#i-diag"/></svg><strong>Разобраться в теме</strong><span class="suggestion-note">Понять сложное на примерах</span></button>
+              <button class="suggestion" type="button" data-prompt="Помоги с кодом. Вот моя задача: "><span class="suggestion-icon"><svg class="icon"><use href="#i-code"/></svg></span><svg class="icon suggest-arrow"><use href="#i-diag"/></svg><strong>Поработать с кодом</strong><span class="suggestion-note">Решить задачу или найти ошибку</span></button>
+            </div>
+          </section>
+        </div>
+        <section class="messages" id="messages" aria-label="Сообщения чата" hidden></section>
+      </div>
+      <div class="compose-area">
+        <div class="compose-inner">
+          <p class="notice" id="notice" role="status" hidden></p>
+          <form class="composer" id="composer" method="post">
+            <input id="attachment-input" type="file" multiple hidden accept="text/*,.md,.csv,.json,.jsonl,.yaml,.yml,.log,.xml,.js,.ts,.py,.sql,.pdf,image/png,image/jpeg,image/webp">
+            <div class="attachment-tray" id="attachment-tray" aria-label="Вложения к сообщению" hidden></div>
+            <textarea id="prompt" name="prompt" aria-label="Сообщение" placeholder="Напишите сообщение…" rows="1" maxlength="12000"></textarea>
+            <div class="composer-actions">
+              <div class="mode-tools">
+                <button class="mode attach" id="attach" type="button" aria-label="Прикрепить файлы" title="Прикрепить файлы — можно также вставить или перетащить"><svg class="icon"><use href="#i-attach"/></svg><span>Файлы</span></button>
+                <button class="mode" id="thinking" type="button" aria-pressed="false" title="Режим рассуждения"><svg class="icon"><use href="#i-think"/></svg> Думать</button>
+                <button class="mode" id="streaming" type="button" aria-pressed="true" title="Показывать ответ по мере генерации"><svg class="icon"><use href="#i-stream"/></svg> Стриминг</button>
+              </div>
+              <div class="send-tools"><span class="enter-hint"><kbd>↵</kbd> отправить</span><button class="send" id="send" type="submit" aria-label="Отправить сообщение"><svg class="icon"><use href="#i-send"/></svg></button></div>
+            </div>
+          </form>
+          <p class="disclaimer">ИИ может ошибаться. Проверяйте важную информацию.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <dialog id="dialog" aria-labelledby="dialog-title">
+    <div class="dialog-top">
+      <span class="dialog-icon"><svg class="icon"><use id="dialog-symbol" href="#i-lock"/></svg></span>
+      <button type="button" class="icon-btn" id="close-dialog" aria-label="Закрыть окно"><svg class="icon"><use href="#i-close"/></svg></button>
+    </div>
+    <h2 id="dialog-title"></h2>
+    <p class="dialog-subtitle" id="dialog-subtitle"></p>
+    <form id="login-form" method="post">
+      <label for="password">Пароль</label>
+      <div class="input-wrap"><input id="password" type="password" autocomplete="current-password" placeholder="Введите пароль" maxlength="1024" required><button class="icon-btn reveal" id="reveal-password" type="button" aria-label="Показать пароль" aria-pressed="false"><svg class="icon"><use href="#i-eye"/></svg></button></div>
+      <p class="form-error" id="login-error" role="alert" hidden></p>
+      <button class="primary" id="login-submit" type="submit">Войти <svg class="icon"><use href="#i-arrow"/></svg></button>
+      <button class="text-button" id="switch-login" type="button">Вход для администратора</button>
+    </form>
+    <form id="settings-form" method="post" hidden>
+      <label for="api-url">URL API</label>
+      <input id="api-url" type="url" placeholder="https://api.example.com/v1" maxlength="512" required>
+      <label for="api-key">Ключ API</label>
+      <div class="input-wrap"><input id="api-key" type="password" placeholder="Ключ провайдера" maxlength="2048" autocomplete="off"><button class="icon-btn reveal" id="reveal-key" type="button" aria-label="Показать ключ" aria-pressed="false"><svg class="icon"><use href="#i-eye"/></svg></button></div>
+      <label for="api-model">Модель</label>
+      <input id="api-model" type="text" placeholder="Название модели у провайдера" maxlength="160" required>
+      <label class="check" for="api-stream"><input id="api-stream" type="checkbox" checked> Разрешить потоковый ответ</label>
+      <div class="selects">
+        <div><label for="api-reasoning">Режим рассуждения</label><select id="api-reasoning"><option value="off">Выключен</option><option value="effort">reasoning_effort</option><option value="nested">reasoning.effort</option></select></div>
+        <div><label for="api-effort">Уровень</label><select id="api-effort" disabled><option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option></select></div>
+      </div>
+      <p class="form-error" id="settings-error" role="alert" hidden></p>
+      <button class="primary" id="save-settings" type="submit">Сохранить для всех <svg class="icon"><use href="#i-arrow"/></svg></button>
+    </form>
+  </dialog>
+</body>
+</html>
